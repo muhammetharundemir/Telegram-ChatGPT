@@ -1,5 +1,5 @@
 # Telegram-ChatGPT
-Telegram-ChatGPT allows you to use Telegram and ChatGPT together.
+Telegram-ChatGPT for using ChatGPT via Telegram.
 
 ## Installation
 Clone the repository:
