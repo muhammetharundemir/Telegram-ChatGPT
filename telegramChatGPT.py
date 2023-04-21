@@ -32,7 +32,7 @@ def reply(lastMessage):                                                 #   Chat
 def replyStartRestart():
     global conversation
     conversation.clear()
-    conversation=[{"role": "system", "content": "You are a helpful assistant. You can only speak Turkish."}]    #   Defined the assistant role.
+    conversation=[{"role": "system", "content": "You are a helpful assistant."}]    #   Defined the assistant role.
     return 'Hello! How can I help you?'
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
