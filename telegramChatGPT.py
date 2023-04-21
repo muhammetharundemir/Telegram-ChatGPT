@@ -9,6 +9,7 @@ conversation=[{"role": "system", "content": "You are a helpful assistant."}]    
 def main():
     app = Application.builder().token(telegram_token).build()           #   Created a Telegram app.
     app.add_handler(CommandHandler('start', start_command))             #   Added start_command function.
+    app.add_handler(CommandHandler('restart', restart_command))         #   Added restart_command function.
     app.add_handler(MessageHandler(filters.TEXT, handle_message))       #   Added handle_message function.
     app.add_error_handler(error)                                        #   Added error_handle function.
     app.run_polling()                                                   #   Started the app.
@@ -22,20 +23,31 @@ def reply(lastMessage):                                                 #   Chat
         messages=conversation,                                          #   Sent all conversation.
         max_tokens=1000                                                 #   Defined as max 1000 tokens. Changeable value.
     )
+    if(len(conversation)>7):                                           #   The conversation has a limit. Only assistant role, last 3 messages and last 3 replies are saved. Other messages and replies are deleted.
+        conversation.pop(1)
     lastReply = completion.choices[0].message['content']                #   Read last reply from completion.
     conversation.append({"role": "assistant", "content": lastReply})    #   Added last reply.
     return lastReply                                                    #   Returned last reply.
+
+def replyStartRestart():
+    global conversation
+    conversation.clear()
+    conversation=[{"role": "system", "content": "You are a helpful assistant. You can only speak Turkish."}]    #   Defined the assistant role.
+    return 'Hello! How can I help you?'
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text: str = update.message.text                                     #   Read last Telegram message from user.
     await update.message.reply_text(reply(text))                        #   Sent ChatGPT message to Telegram user.
 
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text('Hello! How can I help you?')       #   Replied to Telegram user.
+    await update.message.reply_text(replyStartRestart())                #   Replied to Telegram user.
+
+async def restart_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(replyStartRestart())                #   Replied to Telegram user.
 
 async def error(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    print(f'Error: {context.error}')                                    #   Printed error log.
-    await update.message.reply_text('Please wait! If I don\'t respond within a few minutes, try again')     #   Replied to Telegram user.
+    print(f'Error: {context.error}')                                    #   Printed error log
+    await update.message.reply_text('Please wait! If I don\'t respond within a few minutes, try again')     #   Replied to Telegram user
 
 if __name__ == "__main__":
     main()
